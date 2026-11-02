@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: snip
+      POSTGRES_PASSWORD: snip
+      POSTGRES_DB: snip
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U snip']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./api
+    environment:
+      PORT: 3001
+      BASE_URL: http://localhost:3001
+      DATABASE_URL: postgres://snip:snip@postgres:5432/snip
+      REDIS_URL: redis://redis:6379
+      PG_POOL_MAX: 10
+    ports:
+      - '3001:3001'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    # Run migrations then start the API.
+    command: sh -c "node src/migrate.js && node src/index.js"
+
+  worker:
+    build: ./worker
+    environment:
+      DATABASE_URL: postgres://snip:snip@postgres:5432/snip
+      REDIS_URL: redis://redis:6379
+      PG_POOL_MAX: 5
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  web:
+    build: ./web
+    environment:
+      SNIP_API_URL: http://api:3001
+    ports:
+      - '3000:3000'
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

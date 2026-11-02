@@ -1,0 +1,14 @@
+{
+  "name": "snip-worker",
+  "version": "1.0.0",
+  "description": "Snip click-aggregation worker (drains Redis queue -> Postgres)",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "ioredis": "^5.4.1",
+    "pg": "^8.12.0"
+  }
+}
