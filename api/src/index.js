@@ -6,9 +6,15 @@ const { pool } = require('./db');
 const { redis } = require('./redis');
 const linksRouter = require('./routes/links');
 const resolveRouter = require('./routes/resolve');
+const { registerAirRoutes } = require('./air');
 
 const app = express();
 app.use(express.json());
+
+// AIR benchmark support routes (inert unless AIR_BENCHMARK_MODE=1).
+// Registered before the routes below so the guarded /__air paths resolve
+// ahead of the /:slug catch-all. No-op in production.
+registerAirRoutes(app);
 
 // Health check (used by Docker / load balancer).
 app.get('/healthz', async (_req, res) => {

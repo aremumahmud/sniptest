@@ -1,0 +1,14 @@
+version: 1
+app:
+  component: api
+  healthPath: /healthz
+benchmarkMode:
+  envVar: AIR_BENCHMARK_MODE
+  tokenEnvVar: AIR_BENCHMARK_TOKEN
+setup:
+  seed:
+    command: "node api/scripts/air-seed.js --scale {scale}"
+    scales: { small: 1, realistic: 10, large: 100 }
+    expectedRows: { click_stats: 1000, links: 1000, users: 1000 }
+auth:
+  strategy: none

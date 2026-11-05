@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "migrate": "node src/migrate.js"
+    "migrate": "node src/migrate.js",
+    "test": "node --test",
+    "air:seed": "node scripts/air-seed.js"
   },
   "dependencies": {
     "express": "^4.19.2",
